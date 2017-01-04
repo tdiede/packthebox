@@ -26,8 +26,8 @@ turtle.speed(0)
 
 def create_container():
 
-    height = input("What is the height of your container? default:600 >>")
-    width = input("What is the width of your container? default:500 >>")
+    height = input("What is the height of your container? default:600 >>>")
+    width = input("What is the width of your container? default:500 >>>")
     if height and width:
         container = Container(height, width)
     container = Container()
@@ -56,13 +56,13 @@ def gen_random_item():
     shape_key = gen_random_shape()
 
     if shape_key == 0:
-        dimensions = input("What is the desired height/width of your rectangle? default:40,90 >>") or '40,90'
+        dimensions = input("What is the desired height/width of your rectangle? default:40,90 >>>") or '40,90'
         height, width = dimensions.split(',')
         shape = Shape(int(height), int(width))
         # draw_rect(shape)
 
     elif shape_key == 1:
-        radius = input("What is the desired radius of your circle? default:40 >>") or '40'
+        radius = input("What is the desired radius of your circle? default:40 >>>") or '40'
         shape = Shape(int(radius))
         # draw_circle(shape)
 
