@@ -8,80 +8,43 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+The algorithm is built to run with Python 3. The [Turtle](https://docs.python.org/3.0/library/turtle.html) graphics library executes the drawing functions to visualize the spatial outcome.
+
+Turtle uses [tkinter](https://docs.python.org/3/library/tkinter.html#module-tkinter) for its graphics, so be sure to install a version of Python with Tk support.
+
+## Running your Tests
+
+A step by step series of instructions to start testing your hypotheses.
+
+Clone the git repository.
 
 ```
-Give examples
+https://github.com/tdiede/packthebox.git
 ```
 
-### Installing
-
-A step by step series of examples that tell you have to get a development env running
-
-Say what the step will be
+Run the script.py file and input your initial container dimensions.
 
 ```
-Give the example
+python script.py
+What is the height of your container? default:600 >>
+What is the width of your container? default:500 >>
 ```
 
-And repeat
+The shape of the item is randomized between a rectangle or a circle.
+Enter your desired dimensions, depending on the shape.
 
 ```
-until finished
+What is the desired height/width of your rectangle? default:40,90 >>
+What is the desired radius of your circle? default:40 >>
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+The script will execute based on these parameters and the random placement of items in the container.
+At the end, the spatial efficiency value is returned.
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+* **Therese Diede** - Software Engineer
 
 ## Acknowledgments
 
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
+* Inspiration from the many moves I've made in my life.
