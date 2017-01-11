@@ -1,5 +1,4 @@
 """Classes of objects for pack the box."""
-# TODO -- use kwargs to make one class of object for rectangle, square, circle
 
 
 class Container(object):
