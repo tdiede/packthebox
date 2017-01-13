@@ -8,16 +8,14 @@ For anyone who has moved before, there are countless possibilities to pack the s
 
 Test your hypotheses, and see how efficient your outcomes can be.
 
+![User Input](/x_documentation/user-input.gif)
+
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine.
 
-PREREQUISITES
-
-The algorithm is built to run with Python 3. The [Turtle](https://docs.python.org/3.0/library/turtle.html) graphics library executes the drawing functions to visualize the spatial outcome. Turtle uses [tkinter](https://docs.python.org/3/library/tkinter.html#module-tkinter) for its graphics, so be sure to install a version of Python with Tk support.
-
-![User Input](/x_documentation/user-input.gif)
-
+PREREQUISITES: The algorithm is built to run with Python 3. The [Turtle](https://docs.python.org/3.0/library/turtle.html) graphics library executes the drawing functions to visualize the spatial outcome. Turtle uses [tkinter](https://docs.python.org/3/library/tkinter.html#module-tkinter) for its graphics, so be sure to install a version of Python with Tk support.
 
 ## Running your Tests
 
