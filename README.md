@@ -10,6 +10,7 @@ Test your hypotheses, and see how efficient your outcomes can be.
 
 ![User Input](/x_documentation/user-input.gif)
 ![Defaults](/x_documentation/defaults-2frames.gif)
+![Default Results](/x_documentation/default-results-one.png)
 
 
 ## Getting Started
