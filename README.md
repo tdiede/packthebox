@@ -1,6 +1,6 @@
 # Pack the Box.
 
-For anyone who has moved before, there are countless possibilities to pack your shipping container. If all items are the same size and shape, what space efficiency can be achieved by random placement of items inside the container?
+You have a container. Given a series of items of the same size and shape, what space efficiency can be achieved by randomly selecting an x,y coordinate at which to place each item inside the container?
 
 * Is efficiency greater or smaller when items are smaller?
 * What shapes fare better than others?
@@ -51,10 +51,10 @@ At the end, the spatial efficiency value is returned.
 
 ![Circles Results](/x_documentation/large-container-circles-results.gif)
 
-## Authors
+## Runtime
+
+Current runtime is worst-case O(n*(n-1)) because the program checks every existing item in the container before determining whether the current x,y coordinate would cause overlap. It could be even worse than that, adding n*(LOOP_LIMIT-1) in case the max number of placement attempts happens to have been exceeded for every single item added.
+
+## Author
 
 * **Therese Diede** - Software Engineer
-
-## Acknowledgments
-
-* Inspiration from the many moves I've made in my life.
