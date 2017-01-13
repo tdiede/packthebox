@@ -183,6 +183,8 @@ def draw_circle(shape,x,y):
 
 def draw_sequence(container,shape):
 
+    turtle.clear()
+
     draw_container(container)
     print("Now DRAWING !!")
 
