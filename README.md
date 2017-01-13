@@ -49,6 +49,8 @@ What is the desired radius of your circle? default:40 >>>
 The script will execute based on these parameters and the random placement of items in the container.
 At the end, the spatial efficiency value is returned.
 
+![Circles Results](/x_documentation/large-container-circles.gif)
+
 ## Authors
 
 * **Therese Diede** - Software Engineer
