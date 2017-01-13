@@ -16,6 +16,9 @@ PREREQUISITES
 
 The algorithm is built to run with Python 3. The [Turtle](https://docs.python.org/3.0/library/turtle.html) graphics library executes the drawing functions to visualize the spatial outcome. Turtle uses [tkinter](https://docs.python.org/3/library/tkinter.html#module-tkinter) for its graphics, so be sure to install a version of Python with Tk support.
 
+![alt tag](/x_documentation/user-input.png)
+
+
 ## Running your Tests
 
 A few instructions to start testing your hypotheses:
@@ -27,6 +30,7 @@ https://github.com/tdiede/packthebox.git
 ```
 
 Run the script.py file and input your initial container dimensions.
+
 
 ```
 python script.py
