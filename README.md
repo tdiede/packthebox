@@ -1,6 +1,6 @@
 # Pack the Box.
 
-For anyone who has moved before, there are countless possibilities to pack the shipping container. If all items are the same size and shape, what space efficiency can be achieved by random placement of items inside the container?
+For anyone who has moved before, there are countless possibilities to pack your shipping container. If all items are the same size and shape, what space efficiency can be achieved by random placement of items inside the container?
 
 * Is efficiency greater or smaller when items are smaller?
 * What shapes fare better than others?
