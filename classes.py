@@ -13,7 +13,6 @@ class Container(object):
 
         if self.height == self.width:
             return True
-
         return False
 
     def track_items(self):

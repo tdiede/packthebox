@@ -13,9 +13,10 @@ Possible enhancements:
 
 """
 
+import sys
 
 from random import random, randrange
-from math import sqrt, pi
+from math import sqrt, pi, ceil
 
 from classes import Container, Shape
 
@@ -25,14 +26,11 @@ import turtle
 def create_container():
     """Asks user for dimensions and returns instance of Container class."""
 
-    height = int(input("What is the height of your container? default:400 range:100-1000 >>> ") or 400)
-    if height < 100 or height > 1000:
-        height = 400
-        print("Height needs to be in the range of 100 to 1000.  Default " + height + " selected.")
-    width = int(input("What is the width of your container? default:400 range:100-1000 >>> ") or 400)
-    if width < 100 or width > 1000:
-        width = 400
-        print("Width needs to be in the range of 100 to 1000.  Default " + width + " selected.")
+    prompt_height = "What is the height of your container? default:400 range:100-700 >>> "
+    height = collect_valid_input(prompt_height,400,[100,700])
+
+    prompt_width = "What is the width of your container? default:400 range:100-1000 >>> "
+    width = collect_valid_input(prompt_width,400,[100,1000])
 
     container = Container(height, width)
     return container
@@ -42,66 +40,75 @@ def create_shape():
     """Asks user for parameters to create instance of Shape class, which will be the item to keep adding to container."""
 
     # shape_key = gen_random_shape()
-    shape_key = int(input("Enter shape type: 0 FOR RECT or 1 FOR CIRCLE. default:0 range:1-50 >>> ") or 0)
-
-    if shape_key != 0 and shape_key != 1:
-        shape_key = 0
-        print("Selection needs to be 0 or 1.  Default " + shape_key + " selected.")
+    prompt_shape = "Enter shape type: 0 FOR RECT or 1 FOR CIRCLE. default:0 >>> "
+    shape_key = collect_valid_input(prompt_shape,0,[0,1])
 
     if shape_key == 0:
-        dimensions = input("Enter height,width of RECT or SQUARE to be inserted.  default:30,30 range:1-50 >>> ") or '30,30'
-        height,width = [int(n) for n in dimensions.split(',')]
-        if height < 1 or height > 50 or width < 1 or width > 50:
-            height,width = 30,30
-            print("Dimensions need to be in the range of 1 to 50.  Default " + height,width + " selected.")
-
+        prompt_h = "Enter height of RECT or SQUARE to be inserted.  default:30,30 range:1-50 >>> "
+        prompt_w = "Enter width of RECT or SQUARE to be inserted.  default:30,30 range:1-50 >>> "
+        height,width = collect_valid_input(prompt_h,30,[1,50]), collect_valid_input(prompt_w,30,[1,50])
         shape = Shape(height,width)
 
     elif shape_key == 1:
-        radius = int(input("Enter radius of CIRCLE to be inserted.  default:15 range:1-25 ") or 15)
-        if radius < 1 or radius > 25:
-            radius = 15
-            print("Radius needs to be in the range of 1 to 25.  Default " + radius + "selected.")
-
+        prompt_r = "Enter radius of CIRCLE to be inserted. default:15 range:1-25 >>> "
+        radius = collect_valid_input(prompt_r,15,[1,25])
         shape = Shape(radius)
 
     return shape
 
 
-def pack_item(limits):
+def pack_item(container,shape,limits):
 
     x,y = gen_random_coord(limits)
 
-    if does_not_overlap(x,y):
+    if does_not_overlap(container,shape,x,y):
         container.add_items(shape,x,y)
         return True
 
     return False
 
 
-# def keep_packing():
+def keep_packing(container,shape,limits):
+    """Attempts to fit next item."""
 
-#     attempts = 0
+    drawn = 0
+    not_drawn = 0
 
-#     while True:
-#         pack_item()
-#         attempts += 1
-#         if attempts >= 1000 + len(container.items):
-#             print (attempts)
-#             break
+    consec_drawn = 1
+    consec_not_drawn = 1
+    max_consec_drawn = 0
+    max_consec_not_drawn = 0
+
+    while True:
+        if (pack_item(container,shape,limits)):
+            drawn += 1
+            consec_drawn += 1
+            if consec_drawn > max_consec_drawn:
+                max_consec_drawn = consec_drawn
+            if consec_not_drawn > max_consec_not_drawn:
+                max_consec_not_drawn = consec_not_drawn
+            consec_not_drawn = 1
+        else:
+            not_drawn += 1
+            consec_not_drawn += 1
+            consec_drawn = 1
+
+            if consec_not_drawn == LOOP_LIMIT:
+                tracker(drawn,not_drawn,consec_not_drawn,max_consec_drawn,max_consec_not_drawn)
+                break
 
 
 ### TURTLE HELPER FUNCTIONS ###
 
-def set_turtle():
+def set_turtle(WIDTH,HEIGHT,STARTX,STARTY,COLOR,SPEED):
     """Defines turtle interface."""
 
     screen = turtle.getscreen()
     screen.title("Pack the box!")
-    screen.bgcolor("#80A080")
-    screen.setup(width=0.5, height=0.8, startx=50, starty=None)
-
-    turtle.speed(0)
+    screen.bgcolor(COLOR)
+    screen.setup(width=WIDTH, height=HEIGHT, startx=STARTX, starty=STARTY)
+    turtle.speed(SPEED)
+    print("Ready to draw...")
 
 
 def draw_container(container):
@@ -109,10 +116,11 @@ def draw_container(container):
 
     turtle.shape('classic')
     turtle.color('', '')
+    turtle.pensize(3)
     turtle.begin_fill()
     turtle.setheading(0)
-    turtle.setpos(-int(container.width/2), int(container.height/2))
-    turtle.color('red', 'yellow')
+    turtle.setpos(int(-container.width/2), int(container.height/2))
+    turtle.color('white', 'yellow')
     turtle.forward(int(container.width))
     turtle.right(90)
     turtle.forward(int(container.height))
@@ -120,7 +128,8 @@ def draw_container(container):
     turtle.forward(int(container.width))
     turtle.right(90)
     turtle.forward(int(container.height))
-    turtle.color('yellow', 'white')
+    turtle.color('yellow', '')
+    turtle.fillcolor('#DDDDDD')
     turtle.end_fill()
 
 
@@ -131,7 +140,7 @@ def label_coordinates(x,y):
 
     turtle.setpos(x,y)
     position = '('+str(x)+', '+str(y)+')'
-    turtle.color('black', 'blue')
+    turtle.pencolor('black')
     turtle.write(position)
 
 
@@ -140,10 +149,11 @@ def draw_rect(shape,x,y):
 
     turtle.shape('classic')
     turtle.color('', '')
+    turtle.pensize(1)
     turtle.begin_fill()
     turtle.setheading(0)
-    turtle.setpos(x-int(shape.width/2), y+int(shape.height/2))
-    turtle.color('blue', 'black')
+    turtle.setpos(int(x-shape.width/2), int(y+shape.height/2))
+    turtle.color('#444444', 'black')
     turtle.forward(shape.width)
     turtle.right(90)
     turtle.forward(shape.height)
@@ -151,7 +161,8 @@ def draw_rect(shape,x,y):
     turtle.forward(shape.width)
     turtle.right(90)
     turtle.forward(shape.height)
-    turtle.color('black', '')
+    turtle.color('black', 'white')
+    turtle.fillcolor('violet')
     turtle.end_fill()
 
 
@@ -160,30 +171,53 @@ def draw_circle(shape,x,y):
 
     turtle.shape('classic')
     turtle.color('', '')
+    turtle.pensize(1)
     turtle.begin_fill()
-    turtle.setpos(x+shape.radius, y)
-    turtle.color('black', 'red')
-    turtle.circle(shape.radius)
+    turtle.setpos(int(x+shape.radius), int(y))
+    turtle.color('red', 'black')
+    turtle.circle(int(shape.radius))
     turtle.color('black', '')
+    turtle.fillcolor('white')
     turtle.end_fill()
 
 
-def draw_sequence():
+def draw_sequence(container,shape):
 
-    set_turtle()
     draw_container(container)
+    print("Now DRAWING !!")
 
     for item in container.items:
         shape = item['item']
         coordinates = item['coordinates']['x'],item['coordinates']['y']
-        label_coordinates(coordinates[0],coordinates[1])
         if vars(shape)['type'] == 'circle':
             draw_circle(shape,coordinates[0],coordinates[1])
         elif vars(shape)['type'] == 'rectangle':
             draw_rect(shape,coordinates[0],coordinates[1])
+        label_coordinates(coordinates[0],coordinates[1])
+
+    print("Drawing complete.")
 
 
 ### HELPER FUNCTIONS ###
+
+def collect_valid_input(prompt,default,value_range):
+    """Collects valid input from user, given a prompt."""
+
+    while True:
+        try:
+            value = int(input(prompt) or default)
+        except ValueError:
+            print("Invalid entry.")
+            continue
+
+        if value < value_range[0] or value > value_range[1]:
+            print("Please enter a number between " + str(value_range[0]) + " and " + str(value_range[1]) + ".")
+            continue
+        else:
+            break
+
+    return value
+
 
 def gen_random_shape():
     """If the program wants to randomize type of shape."""
@@ -211,7 +245,7 @@ def gen_random_coord(limits):
     return x,y
 
 
-def pad_container(shape):
+def pad_container(container,shape):
     """Pads container bounds according to size of item."""
 
     if vars(shape)['type'] == 'circle':
@@ -227,7 +261,7 @@ def pad_container(shape):
     return top_limit, bottom_limit, right_limit, left_limit
 
 
-def does_not_overlap(x,y):
+def does_not_overlap(container,shape,x,y):
     """Returns True if no overlap with existing items, called every time before item is inserted."""
 
     if vars(shape)['type'] == 'circle':
@@ -258,73 +292,94 @@ def does_not_overlap(x,y):
 
 ### EXTRACT DATA ###
 
-def calculate_container_area():
+def calculate_container_area(container):
     return container.height * container.width
 
 
-def calculate_shape_area():
+def calculate_shape_area(shape):
     if vars(shape)['type'] == 'circle':
         return (shape.radius**2) * pi
     elif vars(shape)['type'] == 'rectangle':
         return shape.height * shape.width
 
 
-def calculate_efficiency():
-    container_area = calculate_container_area()
-    shape_area = calculate_shape_area()
-    return shape_area * len(container.items) / container_area
+def calculate_efficiency(container,shape):
+    container_area = calculate_container_area(container)
+    shape_area = calculate_shape_area(shape)
+    efficiency = shape_area * len(container.items) / container_area
+    return ceil(efficiency * 100 * 100) / 100.
+
+
+def tracker(drawn,
+            not_drawn,
+            consec_not_drawn,
+            max_consec_drawn,
+            max_consec_not_drawn):
+    """Tracks data."""
+
+    print("Total items drawn: " + str(drawn))
+    print("Total items not drawn: " + str(not_drawn))
+    print("Max consecutive items drawn: " + str(max_consec_drawn))
+    print("Consecutive items not drawn (max LOOP_LIMIT " + str(LOOP_LIMIT) + "): " + str(consec_not_drawn))
+    print("Max consecutive items not drawn (previous to max being reached): " + str(max_consec_not_drawn))
+
+
+### PRIMARY FUNCTION TO RUN PROGRAM ###
+
+def pack_the_box(LOOP_LIMIT):
+    """Initializes container and shape, as well as limits of container based on shape."""
+
+    # setup
+    container = create_container()
+    shape = create_shape()
+    print("Container: ", vars(container), "Is a square?", container.is_square())
+    print("Shape variables: ", vars(shape))
+
+    container.items = []  # reset container if program has already been run
+    dimension_limits = pad_container(container,shape)
+
+    # pack the box
+    keep_packing(container,shape,dimension_limits)
+
+    # calculate area efficiency score
+    efficiency = calculate_efficiency(container,shape)
+    print("Packing efficiency: " + str(efficiency) + "%")
+
+    # visualize
+    draw_sequence(container,shape)
+
+    try_again = input("Would you like to try again? (Y/N) >>> ")
+    if try_again == 'Y':
+        pack_the_box(LOOP_LIMIT)
+    elif try_again == 'N':
+        exit()
 
 
 #############################################
 
 if __name__ == "__main__":
-    import doctest
+    # import doctest
+    # result = doctest.testmod()
+    # if not result.failed:
+    #     print("ALL TESTS PASSED. GOOD WORK!")
 
-    result = doctest.testmod()
-    if not result.failed:
-        print("ALL TESTS PASSED. GOOD WORK!")
+    set_turtle(WIDTH=1.0,HEIGHT=1.0,STARTX=0,STARTY=0,COLOR="#EFEFEF",SPEED=0)
 
-    container = create_container()
-    shape = create_shape()
-    print(vars(container), container.is_square())
-    print(vars(shape))
-
-    limits = pad_container(shape)
-
-    efficiency = calculate_efficiency()
+    LOOP_LIMIT = 100000
+    pack_the_box(LOOP_LIMIT)
 
 
+# TODO add way for user to reset and try another shape, size container without exiting the program.
+# TODO record results.
 
 
-    container = create_container()
-    shape = create_shape()
-    print ("Container height",container.height,"Container width",container.width)
-    print ("Shape values", vars(shape))
-    items_drawn = 0
-    loop_limit = 100000
-    total_not_drawn = 0
-    consec_not_drawn = 0
+# def keep_packing():
 
-    limits = pad_container()
-    print("Now DRAWING !!")
-    while True:
-        if (place_item(limits)):  # Changed so that "program end" based on max num of consecutive overlaps
-            items_drawn = items_drawn + 1
-            consec_not_drawn = 0
-        else:
-            total_not_drawn = total_not_drawn + 1
-            consec_not_drawn = consec_not_drawn + 1
-            if (consec_not_drawn >= loop_limit):
-                break
-    print("number items drawn", items_drawn)
-    print("consecutive items not drawn", consec_not_drawn)
-    print("total items not drawn", total_not_drawn)
-    container_area = container.height * container.width
-    if vars(shape)['type'] == 'circle':
-        eff = (items_drawn * (shape.radius**2) * pi) / container_area
-    else:
-        eff = (items_drawn * shape.height * shape.width) / container_area
-    print("packing efficiency = ", eff*100,"%")
+#     attempts = 0
 
-
-
+#     while True:
+#         pack_item()
+#         attempts += 1
+#         if attempts >= 1000 + len(container.items):
+#             print (attempts)
+#             break
