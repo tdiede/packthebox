@@ -16,7 +16,7 @@ PREREQUISITES
 
 The algorithm is built to run with Python 3. The [Turtle](https://docs.python.org/3.0/library/turtle.html) graphics library executes the drawing functions to visualize the spatial outcome. Turtle uses [tkinter](https://docs.python.org/3/library/tkinter.html#module-tkinter) for its graphics, so be sure to install a version of Python with Tk support.
 
-![alt tag](/x_documentation/user-input.png)
+[User Input](/x_documentation/user-input.gif)
 
 
 ## Running your Tests
