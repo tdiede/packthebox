@@ -53,7 +53,15 @@ At the end, the spatial efficiency value is returned.
 
 ## Runtime
 
-Current runtime is worst-case O(n*(n-1)) because the program checks every existing item in the container before determining whether the current x,y coordinate would cause overlap. It could be even worse than that, adding n*(LOOP_LIMIT-1) in case the max number of placement attempts happens to have been exceeded for every single item added.
+The current solution's wost-case runtime is
+```
+O(n*(n-1))
+```
+This is because the program checks every existing item in the container before determining whether the current x,y coordinate would cause overlap. It could be even worse than that, adding
+```
+n*(LOOP_LIMIT-1)
+```
+in case the max number of placement attempts happens to have been exceeded for every single item added.
 
 ## Author
 

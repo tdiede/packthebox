@@ -62,7 +62,8 @@ def pack_item(container,shape,limits):
     x,y = gen_random_coord(limits)
 
     if does_not_overlap(container,shape,x,y):
-        container.add_items(shape,x,y)
+        placed_item = {'item': shape, 'coordinates': {'x': x, 'y': y}}
+        container.add_items(placed_item)
         return True
 
     return False
@@ -369,19 +370,3 @@ if __name__ == "__main__":
 
     LOOP_LIMIT = 100000
     pack_the_box(LOOP_LIMIT)
-
-
-# TODO add way for user to reset and try another shape, size container without exiting the program.
-# TODO record results.
-
-
-# def keep_packing():
-
-#     attempts = 0
-
-#     while True:
-#         pack_item()
-#         attempts += 1
-#         if attempts >= 1000 + len(container.items):
-#             print (attempts)
-#             break
