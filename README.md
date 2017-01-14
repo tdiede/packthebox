@@ -19,7 +19,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 PREREQUISITES: The algorithm is built to run with Python 3. The [Turtle](https://docs.python.org/3.0/library/turtle.html) graphics library executes the drawing functions to visualize the spatial outcome. Turtle uses [tkinter](https://docs.python.org/3/library/tkinter.html#module-tkinter) for its graphics, so be sure to install a version of Python with Tk support.
 
-## Running your Tests
+## Testing Your Hypotheses
 
 A few instructions to start testing your hypotheses:
 
