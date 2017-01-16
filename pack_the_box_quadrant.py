@@ -1,24 +1,19 @@
-""" Pack the box.
+""" Pack the box. Quadrant version.
 
-container: The container can either be a square or a rectangle.
-Parameters to define the container are: square = true or false, h_size, v_size
+Container is divided into quadrants.
+As items are packed, data stores into a dictionary by quadrant number:
 
-item: The item can be a square, a rectangle, or a circle.
-Parameters to define the item are: shape = 0, 1, 2; h_size, v_size, or radius if circle
-
-Possible enhancements:
-1). Implement a faster drawing package.
-2). Extend to 3D.
-3). Make web app with sleek user interface.
+{0:[item,item,item], 1:[item,item], 2:[], 3:[item]}
 
 """
+
 
 import sys
 
 from random import random, randrange
 from math import sqrt, pi, ceil
 
-from classes import Container, Shape
+from classes_quadrant import Container, Shape
 
 import turtle
 
@@ -61,9 +56,22 @@ def pack_item(container,shape,limits):
 
     x,y = gen_random_coord(limits)
 
-    if does_not_overlap(container,shape,x,y):
+    limit_x = limits[4]
+    limit_y = limits[5]
+
+    quadrant = which_quadrant(x,y)
+    if quadrant == 0 and (x < limit_x or y < limit_y):
+        return False
+    elif quadrant == 1 and (x < limit_x or y > -limit_y):
+        return False
+    elif quadrant == 2 and (x > -limit_x or y > -limit_y):
+        return False
+    elif quadrant == 3 and (x > -limit_x or y < limit_y):
+        return False
+
+    if does_not_overlap(container,shape,x,y,quadrant):
         placed_item = {'item': shape, 'coordinates': {'x': x, 'y': y}}
-        container.add_item(placed_item)
+        container.add_item(quadrant,placed_item)
         return True
 
     return False
@@ -79,6 +87,7 @@ def keep_packing(container,shape,limits):
     consec_not_drawn = 1
     max_consec_drawn = 0
     max_consec_not_drawn = 0
+
 
     while True:
         if (pack_item(container,shape,limits)):
@@ -189,14 +198,15 @@ def draw_sequence(container,shape):
     draw_container(container)
     print("Now DRAWING !!")
 
-    for item in container.items:
-        shape = item['item']
-        coordinates = item['coordinates']['x'],item['coordinates']['y']
-        if vars(shape)['type'] == 'circle':
-            draw_circle(shape,coordinates[0],coordinates[1])
-        elif vars(shape)['type'] == 'rectangle':
-            draw_rect(shape,coordinates[0],coordinates[1])
-        label_coordinates(coordinates[0],coordinates[1])
+    for quadrant in container.quadrants.values():
+        for item in quadrant:
+            shape = item['item']
+            coordinates = item['coordinates']['x'],item['coordinates']['y']
+            if vars(shape)['type'] == 'circle':
+                draw_circle(shape,coordinates[0],coordinates[1])
+            elif vars(shape)['type'] == 'rectangle':
+                draw_rect(shape,coordinates[0],coordinates[1])
+            label_coordinates(coordinates[0],coordinates[1])
 
     print("Drawing complete.")
 
@@ -253,22 +263,28 @@ def pad_container(container,shape):
 
     if vars(shape)['type'] == 'circle':
         padding = shape.radius*2, shape.radius*2, shape.radius*2, shape.radius*2
+        quadrant_padding_x = quadrant_padding_y = shape.radius
     elif vars(shape)['type'] == 'rectangle':
         padding = shape.height, shape.height, shape.width, shape.width
+        quadrant_padding_x = shape.width/2
+        quadrant_padding_y = shape.height/2
 
     top_limit = container.height - padding[0]
     bottom_limit = -container.height + padding[1]
     right_limit = container.width - padding[2]
     left_limit = -container.width + padding[3]
 
-    return top_limit, bottom_limit, right_limit, left_limit
+    return top_limit, bottom_limit, right_limit, left_limit, quadrant_padding_x, quadrant_padding_y
 
 
-def does_not_overlap(container,shape,x,y):
+def does_not_overlap(container,shape,x,y,quadrant):
     """Returns True if no overlap with existing items, called every time before item is inserted."""
 
+    container.quadrants[quadrant] = container.quadrants.get(quadrant, [])
+    current_quadrant = container.quadrants[quadrant]
+
     if vars(shape)['type'] == 'circle':
-        for item in container.items:
+        for item in current_quadrant:
             center = item.get('coordinates')
             if (shape.radius*2) < sqrt(((x - center['x'])**2) + ((y - center['y'])**2)):
                 # print("true: x,y: ", x, y, center['x'], center['y'])
@@ -279,7 +295,7 @@ def does_not_overlap(container,shape,x,y):
         return True
 
     elif vars(shape)['type'] == 'rectangle':
-        for item in container.items:
+        for item in current_quadrant:
             center = item.get('coordinates')
             if y < (center['y']-shape.height) or y > (center['y']+shape.height):
                 # print("true: y: ", y, center['y'])
@@ -291,6 +307,21 @@ def does_not_overlap(container,shape,x,y):
                 # print("false")
                 return False
         return True
+
+
+def which_quadrant(x,y):
+    """Given x,y coordinate, returns quadrant as 0,1,2,3."""
+
+    if x >= 0 and y >= 0:
+        quadrant = 0
+    elif x >= 0 and y < 0:
+        quadrant = 1
+    elif x < 0 and y < 0:
+        quadrant = 2
+    elif x < 0 and y >= 0:
+        quadrant = 3
+
+    return quadrant
 
 
 ### EXTRACT DATA ###
@@ -309,7 +340,10 @@ def calculate_shape_area(shape):
 def calculate_efficiency(container,shape):
     container_area = calculate_container_area(container)
     shape_area = calculate_shape_area(shape)
-    efficiency = shape_area * len(container.items) / container_area
+    total_item_count = 0
+    for quadrant in container.quadrants.values():
+        total_item_count += len(quadrant)
+    efficiency = shape_area * total_item_count / container_area
     return ceil(efficiency * 100 * 100) / 100.
 
 
@@ -338,7 +372,6 @@ def pack_the_box(LOOP_LIMIT):
     print("Container: ", vars(container), "Is a square?", container.is_square())
     print("Shape variables: ", vars(shape))
 
-    container.items = []  # reset container if program has already been run
     dimension_limits = pad_container(container,shape)
 
     # pack the box

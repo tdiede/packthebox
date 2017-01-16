@@ -6,7 +6,7 @@ class Container(object):
     def __init__(self, height=600, width=500):
         self.height = height
         self.width = width
-        self.items = []
+        self.quadrants = {}
 
     def is_square(self):
         """Returns true if height and width are equal."""
@@ -25,11 +25,11 @@ class Container(object):
 
         return len(self.items)
 
-    def add_item(self, placed_item):
+    def add_item(self, quadrant, placed_item):
         """Adds item to container."""
 
-        self.items.append(placed_item)
-        return self.items
+        self.quadrants[quadrant].append(placed_item)
+        return self.quadrants
 
 
 class Shape(object):
