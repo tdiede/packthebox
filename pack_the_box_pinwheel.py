@@ -9,6 +9,8 @@ The idea here is that by aiding the equal spread of items in the container fewer
 
 """
 
+### SEE LINE 84 ### CREATE GENERATOR HERE ### YIELD NEXT QUADRANT ###
+
 import datetime
 
 import sys
@@ -17,8 +19,6 @@ from random import uniform, randrange
 from math import sqrt, pi, ceil
 
 from classes_pinwheel import Container, Shape
-
-import itertools
 
 import turtle
 
@@ -83,7 +83,8 @@ def keep_packing(container,shape,limits):
     QUADRANTS = [0,1,2,3]
 
     while True:
-        for each in itertools.cycle(QUADRANTS):
+        ### CREATE GENERATOR HERE ### YIELD NEXT QUADRANT ###
+        for each in QUADRANTS:
             quadrant = each
             print(quadrant)
         if (pack_item(container,shape,limits,quadrant)):
