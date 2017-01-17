@@ -13,6 +13,8 @@ Possible enhancements:
 
 """
 
+import datetime
+
 import sys
 
 from random import random, randrange
@@ -332,6 +334,8 @@ def tracker(drawn,
 def pack_the_box(LOOP_LIMIT):
     """Initializes container and shape, as well as limits of container based on shape."""
 
+    start = datetime.datetime.now()
+
     # setup
     container = create_container()
     shape = create_shape()
@@ -347,6 +351,10 @@ def pack_the_box(LOOP_LIMIT):
     # calculate area efficiency score
     efficiency = calculate_efficiency(container,shape)
     print("Packing efficiency: " + str(efficiency) + "%")
+
+    complete = datetime.datetime.now()
+    packing_time = complete - start
+    print(packing_time, 'seconds')
 
     # visualize
     draw_sequence(container,shape)

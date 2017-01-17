@@ -1,13 +1,11 @@
-""" Pack the box. Quadrant version.
+""" Pack the box. Pinwheel version.
 
 Container is divided into quadrants.
-As items are packed, data stores into a dictionary by quadrant number:
+Each attempt to pack the container rotates through all four quadrants, repeats.
 
-{0:[item,item,item], 1:[item,item], 2:[], 3:[item]}
+Placed items track quadrant: placed_item = {'item': shape, 'quadrant': quadrant, 'coordinates': {'x': x, 'y': y}}
 
-Another variation on the quadrant version would be to alter the rule of the buffer between quadrants.
-Currently, the buffer reprepresents another limit on x,y coordinates, and placement within is not allowed.
-Instead, items whose x,y coordinates fall within the buffer could be placed in multiple quadrant buckets (duplicates in the dictionary).
+The idea here is that by aiding the equal spread of items in the container fewer failed attempts to pack will occur.
 
 """
 
@@ -15,10 +13,12 @@ import datetime
 
 import sys
 
-from random import random, randrange
+from random import uniform, randrange
 from math import sqrt, pi, ceil
 
-from classes_quadrant import Container, Shape
+from classes_pinwheel import Container, Shape
+
+import itertools
 
 import turtle
 
@@ -57,26 +57,13 @@ def create_shape():
     return shape
 
 
-def pack_item(container,shape,limits):
+def pack_item(container,shape,limits,quadrant):
 
-    x,y = gen_random_coord(limits)
+    x,y = gen_random_coord(limits,quadrant)
 
-    limit_x = limits[4]
-    limit_y = limits[5]
-
-    quadrant = which_quadrant(x,y)
-    if quadrant == 0 and (x < limit_x or y < limit_y):
-        return False
-    elif quadrant == 1 and (x < limit_x or y > -limit_y):
-        return False
-    elif quadrant == 2 and (x > -limit_x or y > -limit_y):
-        return False
-    elif quadrant == 3 and (x > -limit_x or y < limit_y):
-        return False
-
-    if does_not_overlap(container,shape,x,y,quadrant):
-        placed_item = {'item': shape, 'coordinates': {'x': x, 'y': y}}
-        container.add_item(quadrant,placed_item)
+    if does_not_overlap(container,shape,x,y):
+        placed_item = {'item': shape, 'quadrant': quadrant, 'coordinates': {'x': x, 'y': y}}
+        container.add_item(placed_item)
         return True
 
     return False
@@ -93,9 +80,13 @@ def keep_packing(container,shape,limits):
     max_consec_drawn = 0
     max_consec_not_drawn = 0
 
+    QUADRANTS = [0,1,2,3]
 
     while True:
-        if (pack_item(container,shape,limits)):
+        for each in itertools.cycle(QUADRANTS):
+            quadrant = each
+            print(quadrant)
+        if (pack_item(container,shape,limits,quadrant)):
             drawn += 1
             consec_drawn += 1
             if consec_drawn > max_consec_drawn:
@@ -244,21 +235,24 @@ def gen_random_shape():
     return shape_key
 
 
-def gen_random_coord(limits):
+def gen_random_coord(limits,quadrant):
     """Program generates random coordinate at which to pack item."""
 
-    scale_x = random() - 0.5
-    scale_y = random() - 0.5
+    if quadrant == 0:
+        limit_x = limits[2]
+        limit_y = limits[0]
+    elif quadrant == 1:
+        limit_x = limits[2]
+        limit_y = -limits[1]
+    elif quadrant == 2:
+        limit_x = -limits[3]
+        limit_y = -limits[1]
+    elif quadrant == 3:
+        limit_x = -limits[3]
+        limit_y = limits[0]
 
-    if scale_x <= 0:
-        x = round(-limits[3] * scale_x, 2)
-    elif scale_x > 0:
-        x = round(limits[2] * scale_x, 2)
-
-    if scale_y <= 0:
-        y = round(-limits[1] * scale_y, 2)
-    elif scale_y > 0:
-        y = round(limits[0] * scale_y, 2)
+    x = round(uniform(0.,limit_x), 2)
+    y = round(uniform(0.,limit_y), 2)
 
     return x,y
 
@@ -268,28 +262,22 @@ def pad_container(container,shape):
 
     if vars(shape)['type'] == 'circle':
         padding = shape.radius*2, shape.radius*2, shape.radius*2, shape.radius*2
-        quadrant_padding_x = quadrant_padding_y = shape.radius
     elif vars(shape)['type'] == 'rectangle':
         padding = shape.height, shape.height, shape.width, shape.width
-        quadrant_padding_x = shape.width/2
-        quadrant_padding_y = shape.height/2
 
     top_limit = container.height - padding[0]
     bottom_limit = -container.height + padding[1]
     right_limit = container.width - padding[2]
     left_limit = -container.width + padding[3]
 
-    return top_limit, bottom_limit, right_limit, left_limit, quadrant_padding_x, quadrant_padding_y
+    return top_limit, bottom_limit, right_limit, left_limit
 
 
-def does_not_overlap(container,shape,x,y,quadrant):
+def does_not_overlap(container,shape,x,y):
     """Returns True if no overlap with existing items, called every time before item is inserted."""
 
-    container.quadrants[quadrant] = container.quadrants.get(quadrant, [])
-    current_quadrant = container.quadrants[quadrant]
-
     if vars(shape)['type'] == 'circle':
-        for item in current_quadrant:
+        for item in container.items:
             center = item.get('coordinates')
             if (shape.radius*2) < sqrt(((x - center['x'])**2) + ((y - center['y'])**2)):
                 # print("true: x,y: ", x, y, center['x'], center['y'])
@@ -300,7 +288,7 @@ def does_not_overlap(container,shape,x,y,quadrant):
         return True
 
     elif vars(shape)['type'] == 'rectangle':
-        for item in current_quadrant:
+        for item in container.items:
             center = item.get('coordinates')
             if y < (center['y']-shape.height) or y > (center['y']+shape.height):
                 # print("true: y: ", y, center['y'])
@@ -312,21 +300,6 @@ def does_not_overlap(container,shape,x,y,quadrant):
                 # print("false")
                 return False
         return True
-
-
-def which_quadrant(x,y):
-    """Given x,y coordinate, returns quadrant as 0,1,2,3."""
-
-    if x >= 0 and y >= 0:
-        quadrant = 0
-    elif x >= 0 and y < 0:
-        quadrant = 1
-    elif x < 0 and y < 0:
-        quadrant = 2
-    elif x < 0 and y >= 0:
-        quadrant = 3
-
-    return quadrant
 
 
 ### EXTRACT DATA ###
@@ -345,10 +318,7 @@ def calculate_shape_area(shape):
 def calculate_efficiency(container,shape):
     container_area = calculate_container_area(container)
     shape_area = calculate_shape_area(shape)
-    total_item_count = 0
-    for quadrant in container.quadrants.values():
-        total_item_count += len(quadrant)
-    efficiency = shape_area * total_item_count / container_area
+    efficiency = shape_area * len(container.items) / container_area
     return ceil(efficiency * 100 * 100) / 100.
 
 
