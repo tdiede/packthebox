@@ -47,6 +47,7 @@ class Container(object):
 
         cells = []
 
+        ### should superimpose circles onto matrix so that entire height and width is not "unavailable" ###
         for h in range(shape.height):
             for w in range(shape.width):
                 i = int((self.height/2) - y) + int(h - (self.height/2))

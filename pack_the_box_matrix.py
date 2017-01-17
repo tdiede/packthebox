@@ -236,14 +236,14 @@ def gen_random_coord(limits):
     scale_y = random() - 0.5
 
     if scale_x <= 0:
-        x = round(-limits[3] * scale_x, 2)
+        x = round(-limits[3] * scale_x)
     elif scale_x > 0:
-        x = round(limits[2] * scale_x, 2)
+        x = round(limits[2] * scale_x)
 
     if scale_y <= 0:
-        y = round(-limits[1] * scale_y, 2)
+        y = round(-limits[1] * scale_y)
     elif scale_y > 0:
-        y = round(limits[0] * scale_y, 2)
+        y = round(limits[0] * scale_y)
 
     return x,y
 
